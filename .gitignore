@@ -21,6 +21,9 @@ VideoCollectorWeb/bin/config.json
 VideoCollectorWeb/src/embedded_ui.cpp
 VideoCollectorWeb/src/embedded_loader.cpp
 
+# ---- Release 成品打包目录（仅本地归集，上传到 GitHub Release，不进仓库）----
+release/
+
 # ---- 本地核验截图、AI 助手目录与临时文件（README 用的图在 docs/screenshots/，要提交）----
 .workbuddy/
 pyVideo/.workbuddy/
