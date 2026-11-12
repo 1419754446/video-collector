@@ -1,0 +1,11 @@
+// VideoCollectorWeb 应用资源：exe 文件图标 + 窗口标题栏/任务栏图标
+#include <windows.h>
+#include "resource.h"
+
+// 应用清单：longPathAware（系统开启长路径后 > 260 字符的路径可直接用）+ asInvoker。
+// 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID，24 = RT_MANIFEST。
+1 24 "app.manifest"
+
+// IDI_APPICON 由 resource.h 定义为数字 101；res\app.ico 内含
+// 16/20/24/32/40/48/64/128/256 九个尺寸，Windows 会按 DPI 自动挑合适的一档。
+IDI_APPICON ICON "..\\res\\app.ico"

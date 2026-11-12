@@ -1,0 +1,39 @@
+# -*- mode: python ; coding: utf-8 -*-
+# PyInstaller 版本资源。
+# 没有这个文件时，exe 的「属性 - 详细信息」全是空的：没有产品名、没有版本号，
+# Windows Defender SmartScreen 与部分企业管控软件会因此把包当成"来源不明的可执行文件"。
+# 文件名固定为 version_info.txt，由 VideoCollector.spec 的 EXE(version=...) 引用。
+# 注意：本文件必须是"单个表达式"，PyInstaller 直接 eval 它，
+# 所以不能写模块级 docstring / import / 变量赋值，说明文字只能放 # 注释里。
+
+VSVersionInfo(
+    ffi=FixedFileInfo(
+        filevers=(2, 0, 0, 0),
+        prodvers=(2, 0, 0, 0),
+        mask=0x3F,
+        flags=0x0,
+        OS=0x40004,
+        fileType=0x1,
+        subtype=0x0,
+        date=(0, 0),
+    ),
+    kids=[
+        StringFileInfo(
+            [
+                StringTable(
+                    "080404b0",
+                    [
+                        StringStruct("CompanyName", "DoubaoVideoTools"),
+                        StringStruct("FileDescription", "视频集中整理工具"),
+                        StringStruct("FileVersion", "2.0.0.0"),
+                        StringStruct("InternalName", "VideoCollector"),
+                        StringStruct("OriginalFilename", "VideoCollector.exe"),
+                        StringStruct("ProductName", "视频集中整理工具"),
+                        StringStruct("ProductVersion", "2.0.0.0"),
+                    ],
+                )
+            ]
+        ),
+        VarFileInfo([VarStruct("Translation", [2052, 1200])]),
+    ],
+)

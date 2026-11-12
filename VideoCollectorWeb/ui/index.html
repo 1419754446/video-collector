@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频集中整理工具</title>
+<!-- 页面图标：内嵌矢量版（与 exe/窗口图标同一套几何），由 tools/make_app_icon.py 生成 -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+DQogIDxkZWZzPg0KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYnJhbmQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4NCiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNmJlZiIvPg0KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjNGY4ZGZmIi8+DQogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxMmI2YzkiLz4NCiAgICA8L2xpbmVhckdyYWRpZW50Pg0KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwLjU1IiBzcHJlYWRNZXRob2Q9InBhZCI+DQogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4xMzMiLz4NCiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+DQogICAgPC9saW5lYXJHcmFkaWVudD4NCiAgPC9kZWZzPg0KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExNS4yMCIgZmlsbD0idXJsKCNicmFuZCkiLz4NCiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMTUuMjAiIGZpbGw9InVybCgjc2hlZW4pIi8+DQogIDxwYXRoIGQ9Ik0xOTUuOTIgMTQ3Ljg1IEwzNDkuMjYgMjM2LjAzIEMzNzIuNDIgMjQ5LjM0IDM3Mi40MiAyNjIuNjYgMzQ5LjI2IDI3NS45NyBMMTk1LjkyIDM2NC4xNSBDMTcyLjkwIDM3Ny4zOCAxNjEuMzkgMzcwLjcyIDE2MS4zOSAzNDQuMTcgTDE2MS4zOSAxNjcuODMgQzE2MS4zOSAxNDEuMjggMTcyLjkwIDEzNC42MiAxOTUuOTIgMTQ3Ljg1IFoiIGZpbGw9IiNmZmZmZmYiLz4NCjwvc3ZnPg0K">
+<script>
+// 首帧前确定主题，避免深色用户看到白屏闪烁
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get('theme');
+    var t = q || localStorage.getItem('vc.theme');
+    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============================ 左侧设置栏 ============================ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <!-- 品牌标：与 exe / 窗口 / 任务栏图标是同一张图（tools/make_app_icon.py 生成），
+             不要再单独画一套图形，否则窗口图标和侧栏标志会对不上 -->
+        <svg viewBox="0 0 512 512" width="30" height="30" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="logoBrand" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#6b6bef"/>
+              <stop offset="0.55" stop-color="#4f8dff"/>
+              <stop offset="1" stop-color="#12b6c9"/>
+            </linearGradient>
+            <linearGradient id="logoSheen" x1="0" y1="0" x2="0" y2="0.55" spreadMethod="pad">
+              <stop offset="0" stop-color="#ffffff" stop-opacity="0.133"/>
+              <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="115.20" fill="url(#logoBrand)"/>
+          <rect width="512" height="512" rx="115.20" fill="url(#logoSheen)"/>
+          <path d="M195.92 147.85 L349.26 236.03 C372.42 249.34 372.42 262.66 349.26 275.97 L195.92 364.15 C172.90 377.38 161.39 370.72 161.39 344.17 L161.39 167.83 C161.39 141.28 172.90 134.62 195.92 147.85 Z"
+                fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">视频集中整理</div>
+        <div class="brand-sub">Video Collector · WebView2</div>
+      </div>
+    </div>
+
+    <div class="sidebar-scroll">
+    <div class="card">
+      <div class="card-head row-between">
+        <span>当前设置</span>
+        <button class="link-btn edit-link" id="setupBtn" title="打开向导修改配置">修改</button>
+      </div>
+      <div class="sum-list">
+        <div class="sum-row"><span>搜索</span><b id="sumSearch">指定目录</b></div>
+        <div class="sum-row"><span>目录</span><b id="sumDir">未选择</b></div>
+        <div class="sum-row"><span>操作</span><b id="sumMode">复制</b></div>
+        <div class="sum-row"><span>重名</span><b id="sumConflict">自动重命名</b></div>
+        <div class="sum-row"><span>开关</span><b id="sumToggles">—</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">外观</div>
+
+      <div class="opt-row">
+        <span class="opt-label">界面主题</span>
+        <div class="seg mini" id="themeSeg">
+          <button data-value="dark" class="active" title="深色主题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+            <b>深色</b>
+          </button>
+          <button data-value="light" title="浅色主题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" stroke-linecap="round"/></svg>
+            <b>浅色</b>
+          </button>
+        </div>
+      </div>
+
+      <div class="opt-row">
+        <span class="opt-label">预览方式</span>
+        <div class="seg mini" id="previewSeg">
+          <button data-value="panel" class="active" title="使用右侧面板预览">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="15" rx="3"></rect><path d="M15 4.5v15" opacity=".55"></path></svg>
+            <b>侧栏内</b>
+          </button>
+          <button data-value="popup" title="弹出独立播放窗口">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6.5" width="13" height="11" rx="2.5"></rect><path d="M18 8.5h3v9h-3" opacity=".6"></path><path d="M7.5 11v3l3-1.5z" fill="currentColor" stroke="none"></path></svg>
+            <b>独立窗口</b>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-note">
+      <b>小提示</b>
+      ① 点「开始搜索」只读列出视频，不会改动任何文件。<br>
+      ② 勾选后点「整理选中」，确认信息后才会真正复制/移动。
+    </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-row main-actions">
+        <button class="btn primary big" id="startBtn" title="只读扫描，先把视频列出来">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4" stroke-linecap="round"></path></svg>
+          开始搜索
+        </button>
+        <button class="btn primary big" id="collectSelectedBtn" disabled title="把勾选的视频复制/移动到目标文件夹">整理选中</button>
+      </div>
+      <button class="btn ghost" id="cancelBtn" disabled>取消任务</button>
+      <div class="footer-hint" id="footerHint">点「修改」配置后开始搜索</div>
+    </div>
+  </aside>
+
+  <!-- ============================ 主区域 ============================ -->
+  <main class="main">
+    <div class="topbar">
+      <div class="title-row">
+        <h1>任务列表</h1>
+        <span class="badge" id="countBadge">0</span>
+        <span class="run-indicator" id="runIndicator" hidden><i></i>处理中</span>
+      </div>
+      <div class="toolbar">
+        <div class="search" id="searchBox" title="按 Ctrl+F 聚焦筛选框">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4" stroke-linecap="round"></path></svg>
+          <input id="filter" type="text" spellcheck="false" placeholder="筛选文件名 / 路径">
+          <kbd>Ctrl+F</kbd>
+        </div>
+        <button class="btn" id="deleteBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 7h15M9 7V5h6v2M6.5 7l.8 12.5h9.4L17.5 7" stroke-linecap="round"></path></svg>
+          <span id="deleteLabel">删除选中</span>
+        </button>
+        <button class="btn" id="openDstBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+          打开目标
+        </button>
+        <div class="menu-wrap" id="moreWrap">
+          <button class="btn" id="moreBtn" title="更多操作：导出报告 / 撤销" aria-haspopup="menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5.2" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="18.8" cy="12" r="1.5" fill="currentColor" stroke="none"></circle></svg>
+            更多
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 10 4 4 4-4" stroke-linecap="round"></path></svg>
+          </button>
+          <div class="menu" id="moreMenu" role="menu" hidden>
+            <button class="btn ghost" id="menuDeleteBtn" role="menuitem" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4.5 7h15M9 7V5h6v2M6.5 7l.8 12.5h9.4L17.5 7" stroke-linecap="round"></path></svg>
+              <span id="menuDeleteLabel">删除选中</span>
+            </button>
+            <button class="btn ghost" id="menuOpenDstBtn" role="menuitem" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+              打开目标
+            </button>
+            <button class="btn ghost" id="reportBtn" role="menuitem" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v10m0 0 4-4m-4 4-4-4" stroke-linecap="round"></path><path d="M4.5 17.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1" stroke-linecap="round"></path></svg>
+              导出 CSV
+            </button>
+            <button class="btn ghost" id="reportHtmlBtn" role="menuitem" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 15c2.2 2.2 5.8 2.2 8 0M8 9c2.2-2.2 5.8-2.2 8 0M8 3v18"/></svg>
+              导出报告
+            </button>
+            <button class="btn ghost" id="undoBtn" role="menuitem" disabled title="撤销本次整理的成果：删除本次生成的副本，移动的文件移回源位置">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10a6 6 0 0 1 0 12h-3"></path></svg>
+              撤销本次整理
+            </button>
+          </div>
+        </div>
+        <button class="btn icon-only" id="helpBtn" title="快捷键说明（F1）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.2a2.8 2.8 0 1 1 3.8 2.6c-.8.4-1.1 1-1.1 1.9M12 17.2h.01"></path></svg>
+        </button>
+        <button class="btn icon-only" id="previewToggleBtn" title="收起 / 展开预览面板">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.2" y="5" width="17.6" height="14" rx="2.4"></rect><path d="M15.4 5v14"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="top-stats">
+      <div class="stats" id="stats"></div>
+
+      <div class="progress-card">
+        <div class="progress-info">
+          <span id="progressText">就绪</span>
+          <span class="progress-pct" id="progressPct">—</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="thead">
+        <label class="check"><input type="checkbox" id="selectAll" title="全选（当前筛选结果）"></label>
+        <div class="th sortable" data-sort="id">序号</div>
+        <div class="th" title="首帧预览">预览</div>
+        <div class="th sortable" data-sort="name">文件名</div>
+        <div class="th sortable num" data-sort="size">大小</div>
+        <div class="th sortable" data-sort="status">状态</div>
+        <div class="th sortable" data-sort="dir">来源文件夹</div>
+      </div>
+      <div class="rows" id="rows">
+        <div class="rows-inner" id="rowsInner"></div>
+      </div>
+      <div class="empty" id="empty">
+        <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="16" y="30" width="88" height="58" rx="12" opacity=".35"></rect>
+          <path d="M30 57v14l17-7z" opacity=".6"></path>
+          <path d="M16 46h88" opacity=".35"></path>
+          <circle cx="96" cy="38" r="3" opacity=".5"></circle>
+          <circle cx="24" cy="38" r="3" opacity=".5"></circle>
+        </svg>
+        <div class="empty-title">还没有视频记录</div>
+        <div class="empty-sub">在左侧选择源目录与目标文件夹，然后点击「开始整理」</div>
+      </div>
+    </div>
+
+    <div class="log-card" id="logCard">
+      <div class="log-head">
+        <button class="log-title" id="logToggle">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 10 4 4 4-4" stroke-linecap="round"></path></svg>
+          运行日志
+          <span class="log-count" id="logCount">0</span>
+        </button>
+        <span class="grow"></span>
+        <button class="link-btn" id="logClear">清空</button>
+      </div>
+      <div class="log-resize" id="logResize" title="拖拽调整日志高度"></div>
+      <div class="log-body" id="logBody"></div>
+    </div>
+  </main>
+
+  <!-- ============================ 右侧预览 ============================ -->
+  <aside class="preview" id="previewPanel">
+    <div class="preview-head">
+      <span>视频预览</span>
+      <div class="head-actions">
+        <button class="icon-btn" id="previewPopout" title="在独立窗口播放">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6.5" width="12" height="10" rx="2.5"></rect><path d="M17 8.5h4v9h-4" opacity=".6"></path><path d="m7 5.5 2-2.5M14 5.5l-2-2.5" opacity="0"></path></svg>
+        </button>
+        <button class="icon-btn" id="previewCollapse" title="收起预览">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 10 4 4 4-4" stroke-linecap="round" transform="rotate(-90 12 12)"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="video-stage" id="videoStage">
+      <video id="video" playsinline preload="metadata"></video>
+      <div class="video-placeholder" id="videoPlaceholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="3"></rect><path d="M10 9.5v5l4.2-2.5z" fill="currentColor" stroke="none"></path></svg>
+        <span class="ph-title">选择一个视频</span>
+        <span class="ph-sub">双击列表中的视频，这里会显示画面</span>
+      </div>
+      <button class="pv-center-play" id="pvCenterPlay" title="播放">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6l11-6.8z"></path></svg>
+      </button>
+      <div class="video-fail" id="videoFail" hidden>
+        <div class="vf-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3.2 21 19H3z"></path><path d="M12 9.5v4.2M12 16.6h.01"></path></svg>
+        </div>
+        <div class="vf-title" id="vfTitle">内置播放器打不开这个视频</div>
+        <div class="vf-sub" id="vfSub">容器或编码不受支持（如 AVI / RMVB / WMV / MKV 里的 XVID、AC3 音轨）。</div>
+        <button class="vf-btn" id="vfSystem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="4.5" width="19" height="15" rx="3"></rect><path d="M10 9.5v5l4.2-2.5z" fill="currentColor" stroke="none"></path></svg>
+          用系统播放器打开
+        </button>
+      </div>
+    </div>
+
+    <!-- 播放控制区：位于视频下方独立成排（进度 / 时间·静音·音量 / 倍速 / 播放·系统播放器） -->
+    <div class="pv-player" id="pvControls">
+      <div class="seek" id="pvSeek" title="拖动定位">
+        <div class="seek-buffer" id="pvSeekBuffer"></div>
+        <div class="seek-played" id="pvSeekPlayed"><i></i></div>
+      </div>
+      <div class="pv-row">
+        <span class="pv-time" id="pvTime">00:00 / 00:00</span>
+        <div class="pv-spacer"></div>
+        <button class="pv-mute" id="pvBtnMute" title="静音（M）">
+          <span>静音</span>
+          <svg id="pvIconVolume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4z"></path><path d="M15 9a4.5 4.5 0 0 1 0 6"></path><path d="M17.6 6.6a8 8 0 0 1 0 10.8"></path></svg>
+          <svg id="pvIconMuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none"><path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4z"></path><path d="M15.5 9.2l4.6 5.6M20.1 9.2l-4.6 5.6" stroke-linecap="round"></path></svg>
+        </button>
+        <input class="pv-volume" id="pvVolume" type="range" min="0" max="1" step="0.02" value="1" title="音量">
+      </div>
+      <div class="pv-row">
+        <span class="pv-label">倍速</span>
+        <select class="pv-rate" id="pvRate" title="播放速度">
+          <option value="0.5">0.5×</option>
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+          <option value="2">2×</option>
+        </select>
+      </div>
+      <div class="pv-row">
+        <button class="pv-btn play" id="pvBtnPlay" title="播放/暂停" disabled>
+          <svg id="pvIconPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6l11-6.8z"></path></svg>
+          <svg id="pvIconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="7" y="5" width="3.4" height="14" rx="1.2"></rect><rect x="13.6" y="5" width="3.4" height="14" rx="1.2"></rect></svg>
+          <span id="pvPlayLabel">播放</span>
+        </button>
+        <button class="pv-btn" id="pvSystem" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="4.5" width="19" height="15" rx="3"></rect><path d="M10 9.5v5l4.2-2.5z" fill="currentColor" stroke="none"></path></svg>
+          <span>系统播放器</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pv-info">
+      <div class="pv-sec">文件信息</div>
+      <div class="pv-name" id="pvName">未选择视频</div>
+      <div class="pv-meta" id="pvMeta"></div>
+      <div class="pv-path" id="pvPath" title="点击复制路径"></div>
+      <div class="pv-state" id="pvState"></div>
+    </div>
+
+    <div class="pv-actions">
+      <button class="pv-btn" id="pvFolder" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg>
+        <span>所在文件夹</span>
+      </button>
+      <button class="pv-btn" id="pvPopout" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="3.5" width="12.5" height="12.5" rx="2.4"></rect><path d="M15.5 20.5H7A3.5 3.5 0 0 1 3.5 17V8.5" stroke-linecap="round"></path></svg>
+        <span>独立窗口</span>
+      </button>
+      <button class="pv-btn danger full" id="pvDelete" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6.5h16M9.5 6.5V4.6h5v1.9M6.8 6.5l.9 12.4h8.6l.9-12.4" stroke-linecap="round"></path></svg>
+        <span>删除</span>
+      </button>
+    </div>
+
+    <div class="pv-tip">
+      <b>提示</b> 内置播放器对 MKV / RMVB / AVI 等格式支持有限，打不开时可点「系统播放器」查看。
+    </div>
+  </aside>
+</div>
+
+<!-- 展开预览按钮 -->
+<button class="preview-fab" id="previewFab" title="展开预览面板">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="4.5" width="19" height="15" rx="3"></rect><path d="M10 9.5v5l4.2-2.5z" fill="currentColor" stroke="none"></path></svg>
+</button>
+
+<!-- 右键菜单 -->
+<div class="ctx-menu" id="ctxMenu" hidden>
+  <button data-act="preview">预览播放</button>
+  <button data-act="popout">独立窗口播放</button>
+  <button data-act="open">系统播放器打开</button>
+  <button data-act="reveal">打开所在文件夹</button>
+  <button data-act="copy">复制文件路径</button>
+  <div class="ctx-sep"></div>
+  <button data-act="delete" class="danger">删除（移入回收站）</button>
+</div>
+
+<!-- 最近使用目录 -->
+<div class="ctx-menu hist-menu" id="histMenu" hidden></div>
+
+<!-- 模态框 -->
+<div class="modal-mask" id="modalMask" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <label class="modal-check" id="modalCheckRow" hidden>
+      <input type="checkbox" id="modalCheck" checked>
+      <span id="modalCheckText"></span>
+    </label>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modalCancel">取消</button>
+      <button class="btn primary" id="modalOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 整理设置向导（首次启动与可随时调用的三步引导） -->
+<div class="modal-mask" id="setupMask" hidden>
+  <div class="modal setup-modal" role="dialog" aria-modal="true">
+    <div class="setup-head">
+      <div class="setup-steps" id="setupSteps">
+        <span class="step active" data-step="0" title="从哪里找视频">① 搜索方式</span>
+        <span class="step" data-step="1" title="要哪些格式、多大">② 格式与大小</span>
+        <span class="step" data-step="2" title="如何处理文件">③ 操作方式</span>
+        <span class="step" data-step="3" title="细节选项">④ 开关</span>
+      </div>
+      <button class="icon-btn" id="setupClose" title="关闭（保留已选设置）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div class="setup-body" id="setupBody">
+
+      <!-- 第 1 步：搜索方式 + 目录 -->
+      <div class="setup-step-body" data-panel="0">
+        <div class="field-label">从哪里找视频</div>
+        <div class="choice-row">
+          <button class="choice-card" data-mode="dir" role="radio" aria-checked="true">
+            <b>指定目录</b><small>扫描源目录（可递归）</small>
+          </button>
+          <button class="choice-card" data-mode="all" role="radio" aria-checked="false">
+            <b>全盘搜索</b><small>只读扫描，可勾选磁盘</small>
+          </button>
+        </div>
+
+        <div class="field" id="fieldSrc">
+          <div class="field-label">源目录 <span class="hint">全盘搜索时不需要</span>
+            <button class="icon-btn tiny" id="swapDirs" title="交换源目录与目标文件夹" style="margin-left:auto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5h16m-3.5-3.5 3.5 3.5-3.5 3.5M20.5 15.5h-16m3.5-3.5-3.5 3.5 3.5 3.5"></path></svg>
+            </button>
+          </div>
+          <div class="input-group">
+            <input id="src" type="text" spellcheck="false" placeholder="选择或拖入文件夹…">
+            <button class="icon-btn" id="histSrc" title="最近使用过的源目录">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 9V7.5a7.5 7.5 0 1 1-.4 5"></path><path d="M3 5.5V9h3.5M12 7.5v5l3.6 2"></path></svg>
+            </button>
+            <button class="icon-btn" id="pickSrc" title="浏览文件夹">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">目标文件夹 <span class="hint">集中存放</span></div>
+          <div class="input-group">
+            <input id="dst" type="text" spellcheck="false" placeholder="选择目标文件夹…">
+            <button class="icon-btn" id="histDst" title="最近使用过的目标文件夹">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 9V7.5a7.5 7.5 0 1 1-.4 5"></path><path d="M3 5.5V9h3.5M12 7.5v5l3.6 2"></path></svg>
+            </button>
+            <button class="icon-btn" id="pickDst" title="浏览文件夹">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 第 2 步：格式与大小（指定目录 / 全盘搜索都要用） -->
+      <div class="setup-step-body" data-panel="1" hidden>
+        <div class="field-label">要哪些格式 <span class="hint">点开勾选</span>
+          <button class="link-btn reset-link" id="resetExts" type="button">恢复默认</button>
+        </div>
+        <div class="ext-picker">
+          <button class="ext-btn" id="extBtn" type="button" aria-expanded="false">
+            <span id="extSummary">—</span>
+            <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <div class="ext-pop" id="extPop" hidden>
+            <div class="ext-grid" id="extGrid"></div>
+            <div class="ext-custom">
+              <input id="extCustom" type="text" spellcheck="false" placeholder="其它扩展名，逗号分隔，如 mxf,dat">
+            </div>
+            <div class="ext-actions">
+              <button class="link-btn" id="extAll" type="button">全选</button>
+              <button class="link-btn" id="extNone" type="button">清空</button>
+            </div>
+          </div>
+        </div>
+        <input id="exts" type="hidden" spellcheck="false">
+
+        <div class="field">
+          <div class="field-label">体积范围 <span class="hint">单位 MB · 留空或 0 表示不限</span></div>
+          <div class="size-range">
+            <input id="minSize" type="number" min="0" step="1" inputmode="decimal" placeholder="最小">
+            <span class="size-dash">—</span>
+            <input id="maxSize" type="number" min="0" step="1" inputmode="decimal" placeholder="最大">
+            <em>MB</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第 3 步：操作方式 -->
+      <div class="setup-step-body" data-panel="2" hidden>
+        <div class="field-label">操作方式</div>
+        <div class="seg" id="modeSeg">
+          <button data-value="copy" class="active"><b>复制</b><small>保留原文件</small></button>
+          <button data-value="move"><b>移动</b><small>原文件移走</small></button>
+        </div>
+        <div class="field-label seg-title">文件重名时</div>
+        <div class="seg" id="conflictSeg">
+          <button data-value="rename" class="active"><b>自动重命名</b><small>xxx (1).mp4</small></button>
+          <button data-value="skip"><b>同名跳过</b><small>不覆盖</small></button>
+        </div>
+      </div>
+
+      <!-- 第 4 步：开关 -->
+      <div class="setup-step-body" data-panel="3" hidden>
+        <div class="field-label">整理开关</div>
+        <div class="switches">
+          <label class="switch-row">
+            <span><b>包含子文件夹</b><small>递归扫描全部层级</small></span>
+            <input type="checkbox" id="optRecursive" class="switch" checked>
+          </label>
+          <label class="switch-row">
+            <span><b>跳过隐藏项</b><small>忽略系统属性文件</small></span>
+            <input type="checkbox" id="optHidden" class="switch" checked>
+          </label>
+          <label class="switch-row">
+            <span><b>跳过相同视频</b><small>按大小 + 首/中/尾内容指纹比对</small></span>
+            <input type="checkbox" id="optDedupe" class="switch" checked>
+          </label>
+          <label class="switch-row">
+            <span><b>完成后打开目标</b><small>任务结束自动打开目标文件夹</small></span>
+            <input type="checkbox" id="optAutoOpen" class="switch">
+          </label>
+        </div>
+      </div>
+
+    </div>
+    <div class="setup-nav">
+      <button class="btn ghost" id="setupPrev" hidden>上一步</button>
+      <div class="spacer"></div>
+      <button class="btn primary" id="setupNext">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- 全盘搜索：手动勾选盘符 -->
+<div class="modal-mask" id="scanAllMask" hidden>
+  <div class="modal scan-modal" role="dialog" aria-modal="true">
+    <div class="modal-title">全盘搜索</div>
+    <div class="modal-body">选择要搜索的磁盘（默认全不选）。搜索全程只读，不会移动、复制或删除任何文件。<br>系统目录、隐藏项、链接目录与目标文件夹会自动跳过。</div>
+    <div class="drive-list" id="driveList"></div>
+    <div class="field">
+      <div class="field-label">额外排除的目录名或路径 <span class="hint">逗号分隔，可选</span></div>
+      <div class="input-group"><input id="scanExclude" type="text" spellcheck="false" placeholder="例如：临时素材, D:\归档"></div>
+    </div>
+    <div class="scan-max">
+      <span>最多列出</span>
+      <input id="scanMax" type="number" min="100" max="200000" step="1000" value="20000">
+      <span>个视频</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="scanAllCancel">取消</button>
+      <button class="btn primary" id="scanAllOk">开始搜索</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

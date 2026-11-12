@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频预览</title>
+<!-- 页面图标：内嵌矢量版（与 exe/窗口图标同一套几何），由 tools/make_app_icon.py 生成 -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+DQogIDxkZWZzPg0KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYnJhbmQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4NCiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNmJlZiIvPg0KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjU1IiBzdG9wLWNvbG9yPSIjNGY4ZGZmIi8+DQogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxMmI2YzkiLz4NCiAgICA8L2xpbmVhckdyYWRpZW50Pg0KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2hlZW4iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIwLjU1IiBzcHJlYWRNZXRob2Q9InBhZCI+DQogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMC4xMzMiLz4NCiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+DQogICAgPC9saW5lYXJHcmFkaWVudD4NCiAgPC9kZWZzPg0KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExNS4yMCIgZmlsbD0idXJsKCNicmFuZCkiLz4NCiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMTUuMjAiIGZpbGw9InVybCgjc2hlZW4pIi8+DQogIDxwYXRoIGQ9Ik0xOTUuOTIgMTQ3Ljg1IEwzNDkuMjYgMjM2LjAzIEMzNzIuNDIgMjQ5LjM0IDM3Mi40MiAyNjIuNjYgMzQ5LjI2IDI3NS45NyBMMTk1LjkyIDM2NC4xNSBDMTcyLjkwIDM3Ny4zOCAxNjEuMzkgMzcwLjcyIDE2MS4zOSAzNDQuMTcgTDE2MS4zOSAxNjcuODMgQzE2MS4zOSAxNDEuMjggMTcyLjkwIDEzNC42MiAxOTUuOTIgMTQ3Ljg1IFoiIGZpbGw9IiNmZmZmZmYiLz4NCjwvc3ZnPg0K">
+<script>
+(function () {
+  try {
+    var t = new URLSearchParams(location.search).get('theme') || 'dark';
+    if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="preview.css">
+</head>
+<body>
+<div class="player" id="player">
+  <video id="video" playsinline preload="metadata"></video>
+
+  <header class="topbar" id="topbar">
+    <div class="file">
+      <span class="live-dot"></span>
+      <div class="txt">
+        <div class="name" id="fileName">视频预览</div>
+        <div class="sub" id="fileSub"></div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="chip-btn" id="btnOpen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="4.5" width="19" height="15" rx="3"></rect><path d="M10 9.5v5l4.2-2.5z" fill="currentColor" stroke="none"></path></svg>
+        <span>系统播放器</span>
+      </button>
+      <button class="chip-btn" id="btnReveal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path></svg>
+        <span>所在文件夹</span>
+      </button>
+      <button class="chip-btn danger" id="btnClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path></svg>
+        <span>关闭</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="viewport" id="viewport">
+    <button class="center-play" id="centerPlay" aria-label="播放">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6l11-6.8z"></path></svg>
+    </button>
+
+    <div class="error" id="error" hidden>
+      <div class="error-icon">!</div>
+      <div class="error-title">内置播放器无法播放</div>
+      <div class="error-sub">该视频的封装格式或编码可能不受支持，请使用系统播放器打开。</div>
+      <button class="chip-btn" id="errOpen">用系统播放器打开</button>
+    </div>
+
+    <div class="loading" id="loading">
+      <span class="ring"></span>
+      <span>正在加载…</span>
+    </div>
+  </div>
+
+  <footer class="controls" id="controls">
+    <div class="seek" id="seek">
+      <div class="seek-buffer" id="seekBuffer"></div>
+      <div class="seek-played" id="seekPlayed"><i></i></div>
+    </div>
+    <div class="bar">
+      <button class="icon" id="btnPlay" title="播放/暂停（空格）">
+        <svg id="iconPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6l11-6.8z"></path></svg>
+        <svg id="iconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="7" y="5" width="3.4" height="14" rx="1.2"></rect><rect x="13.6" y="5" width="3.4" height="14" rx="1.2"></rect></svg>
+      </button>
+      <span class="time" id="time">00:00 / 00:00</span>
+      <div class="path" id="path" title="点击复制完整路径"></div>
+      <div class="spacer"></div>
+      <button class="icon" id="btnMute" title="静音（M）">
+        <svg id="iconVolume" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4z"></path><path d="M15 9a4.5 4.5 0 0 1 0 6"></path><path d="M17.6 6.6a8 8 0 0 1 0 10.8"></path></svg>
+        <svg id="iconMuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none"><path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4z"></path><path d="M15.5 9.2l4.6 5.6M20.1 9.2l-4.6 5.6" stroke-linecap="round"></path></svg>
+      </button>
+      <input class="volume" id="volume" type="range" min="0" max="1" step="0.02" value="1">
+      <select class="rate" id="rate" title="播放速度">
+        <option value="0.5">0.5×</option>
+        <option value="0.75">0.75×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+      <button class="icon" id="btnFull" title="全屏（F）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke-linecap="round"></path></svg>
+      </button>
+    </div>
+  </footer>
+</div>
+<script src="preview.js"></script>
+</body>
+</html>

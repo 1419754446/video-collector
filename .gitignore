@@ -1,0 +1,32 @@
+# ---- Python 版构建产物与缓存 ----
+pyVideo/build/
+pyVideo/dist/
+pyVideo/__pycache__/
+pyVideo/**/__pycache__/
+*.pyc
+
+# ---- Python 版运行期数据 ----
+# 缩略图缓存在用户目录（~/.videocollector/），不进仓库
+
+# ---- C++ 版构建产物 ----
+VideoCollectorWeb/obj/
+VideoCollectorWeb/bin/*.exe
+VideoCollectorWeb/bin/*.log
+VideoCollectorWeb/bin/data/
+VideoCollectorWeb/bin/config.json
+
+# WebView2 SDK：纳入仓库（离线编译可直接使用，无需另行还原 NuGet 包）
+
+# src/ 下的内嵌资源由 tools/embed_ui.ps1 生成
+VideoCollectorWeb/src/embedded_ui.cpp
+VideoCollectorWeb/src/embedded_loader.cpp
+
+# ---- 本地核验截图、AI 助手目录与临时文件（README 用的图在 docs/screenshots/，要提交）----
+.workbuddy/
+pyVideo/.workbuddy/
+.screenshots/
+pyVideo/.screenshots/
+VideoCollectorWeb/.shots/
+VideoCollectorWeb/*.log
+*.tmp
+*.bak
